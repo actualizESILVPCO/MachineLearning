@@ -1,0 +1,58 @@
+# Final comparison
+final_results = pd.DataFrame([{k: v for k, v in r.items() if k != 'model_object'} for r in all_results])
+
+print('\n')
+print('Final Model Comparison')
+print('\n')
+print(final_results.to_string(index=False))
+
+# Best model
+best_final_idx = final_results['Test_MAE'].idxmin()
+best_final_model = final_results.loc[best_final_idx, 'Model']
+best_final_mae = final_results.loc[best_final_idx, 'Test_MAE']
+
+print('\n')
+print(f'BEST MODEL: {best_final_model}')
+print(f'Test MAE: {best_final_mae:.2f}')
+print(f'Test RMSE: {final_results.loc[best_final_idx, "Test_RMSE"]:.2f}')
+print(f'Test R**2: {final_results.loc[best_final_idx, "Test_R2"]:.4f}')
+print('\n')
+
+
+
+# Visualize comparison
+fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+
+# MAE comparison
+axes[0].barh(final_results['Model'], final_results['Test_MAE'])
+axes[0].set_xlabel('MAE')
+axes[0].set_title('Model Comparison - MAE (lower is better)')
+axes[0].invert_yaxis()
+
+# RMSE comparison
+axes[1].barh(final_results['Model'], final_results['Test_RMSE'])
+axes[1].set_xlabel('RMSE')
+axes[1].set_title('Model Comparison - RMSE (lower is better)')
+axes[1].invert_yaxis()
+
+# R² comparison
+axes[2].barh(final_results['Model'], final_results['Test_R2'])
+axes[2].set_xlabel('R**2')
+axes[2].set_title('Model Comparison - R² (higher is better)')
+axes[2].invert_yaxis()
+
+plt.tight_layout()
+plt.show()
+
+
+importances = best_xgb_model.feature_importances_
+indices = np.argsort(importances)[::-1]
+feature_names = X_train.columns
+
+plt.figure(figsize=(10, 6))
+plt.title("Feature Importances (XGBoost)")
+plt.bar(range(20), importances[indices][:20], align='center')
+plt.xticks(range(20), feature_names[indices][:20], rotation=45)
+plt.show()
+
+print('Top 10 important features:', feature_names[indices][:10].tolist())
