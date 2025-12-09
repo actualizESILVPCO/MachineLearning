@@ -1,0 +1,131 @@
+
+
+# Function to evaluate models
+def evaluate_model(model, X_train, X_test, y_train, y_test, model_name):
+    print('\n')
+    print(f'{model_name}')
+    print('\n')
+
+    # Train
+    start_time = time.time()
+    model.fit(X_train, y_train)
+    train_time = time.time() - start_time
+
+    # Predictions
+    y_train_pred = model.predict(X_train)
+    y_test_pred = model.predict(X_test)
+
+    # Metrics
+    train_mae = mean_absolute_error(y_train, y_train_pred)
+    train_rmse = np.sqrt(mean_squared_error(y_train, y_train_pred))
+    train_r2 = r2_score(y_train, y_train_pred)
+
+    test_mae = mean_absolute_error(y_test, y_test_pred)
+    test_rmse = np.sqrt(mean_squared_error(y_test, y_test_pred))
+    test_r2 = r2_score(y_test, y_test_pred)
+
+    print(f'Training time: {train_time:.2f}s')
+    print(f'\nTRAIN METRICS:')
+    print(f'  MAE:  {train_mae:.2f}')
+    print(f'  RMSE: {train_rmse:.2f}')
+    print(f'  R**2:   {train_r2:.4f}')
+
+    print(f'\nTEST METRICS:')
+    print(f'  MAE:  {test_mae:.2f}')
+    print(f'  RMSE: {test_rmse:.2f}')
+    print(f'  R**2:   {test_r2:.4f}')
+
+    return {
+        'Model': model_name,
+        'Train_MAE': train_mae,
+        'Test_MAE': test_mae,
+        'Train_RMSE': train_rmse,
+        'Test_RMSE': test_rmse,
+        'Train_R2': train_r2,
+        'Test_R2': test_r2,
+        'Time': train_time,
+        'model_object': model
+    }
+
+
+# Store results
+all_results = []
+
+# Model 1: Linear Regression
+lr_model = LinearRegression()
+result_lr_model = evaluate_model(lr_model, X_train, X_test, y_train, y_test, 'Linear Regression')
+all_results.append(result_lr_model)
+
+# Model 2: Ridge Regression
+ridge = Ridge(alpha=1.0, random_state=42)
+result_ridge = evaluate_model(ridge, X_train, X_test, y_train, y_test, 'Ridge Regression')
+all_results.append(result_ridge)
+
+# Model 3: Random Forest
+rf = RandomForestRegressor(n_estimators=100, max_depth=10, random_state=42, n_jobs=-1)
+result_rf = evaluate_model(rf, X_train, X_test, y_train, y_test, 'Random Forest')
+all_results.append(result_rf)
+
+# Create comparison dataframe
+results_df = pd.DataFrame([{k: v for k, v in r.items() if k != 'model_object'} for r in all_results])
+
+
+print('BASELINE MODELS COMPARISON')
+print('\n')
+print(results_df.to_string(index=False))
+
+# Identify best model
+best_idx = results_df['Test_MAE'].idxmin()
+best_model_name = results_df.loc[best_idx, 'Model']
+print(f'\nBest baseline model (by MAE): {best_model_name}')
+
+# Get predictions from best model
+best_model = all_results[best_idx]['model_object']
+y_pred = best_model.predict(X_test)
+
+# Create visualizations
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# Actual vs Predicted
+axes[0].scatter(y_test, y_pred, alpha=0.5, s=10)
+axes[0].plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()],
+             'r--', lw=2, label='Perfect Prediction')
+axes[0].set_xlabel('Actual Loss')
+axes[0].set_ylabel('Predicted Loss')
+axes[0].set_title(f'{best_model_name}: Predictions vs Actual')
+axes[0].legend()
+axes[0].grid(True, alpha=0.3)
+
+# Residuals
+residuals = y_test - y_pred
+axes[1].scatter(y_pred, residuals, alpha=0.5, s=10)
+axes[1].axhline(0, color='r', linestyle='--', lw=2)
+axes[1].set_xlabel('Predicted Loss')
+axes[1].set_ylabel('Residuals')
+axes[1].set_title(f'{best_model_name}: Residual Plot')
+axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+# Error distribution
+errors = np.abs(y_test - y_pred)
+
+plt.figure(figsize=(10, 5))
+plt.hist(errors, bins=50, edgecolor='black', alpha=0.7)
+plt.axvline(errors.mean(), color='red', linestyle='--', linewidth=2,
+            label=f'Mean Error: {errors.mean():.2f}')
+plt.axvline(errors.median(), color='green', linestyle='--', linewidth=2,
+            label=f'Median Error: {errors.median():.2f}')
+plt.xlabel('Absolute Error')
+plt.ylabel('Frequency')
+plt.title(f'{best_model_name}: Error Distribution')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+print(f'Error Statistics:')
+print(f'  Mean: {errors.mean():.2f}')
+print(f'  Median: {errors.median():.2f}')
+print(f'  Std: {errors.std():.2f}')
+print(f'  Max: {errors.max():.2f}')
