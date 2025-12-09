@@ -334,3 +334,19 @@ Ensure SEED=42 is set before any stochastic operation
 
 Note: Exact numerical results may vary slightly across different hardware/OS due to floating-point arithmetic, but differences should be negligible (<0.1%).
 
+Limitations and Future Work
+Current limitations:
+
+Dataset is fully anonymized (limits business interpretation)
+Single train-test split (no nested cross-validation)
+Limited hyperparameter search space (computational constraints)
+No stacking or advanced ensemble methods
+
+Potential improvements:
+
+Implement nested cross-validation for more robust evaluation
+Explore advanced encoding methods (target encoding, embeddings)
+Test additional models (LightGBM, CatBoost)
+Implement SHAP values for better interpretability
+Optimize for prediction speed (model compression)
+
