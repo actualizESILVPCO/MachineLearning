@@ -312,3 +312,25 @@ max_depth: 5
 learning_rate: 0.1
 Cross-validation MAE: 0.417 (log scale)
 
+# Reproducibility
+All results in this project are fully reproducible due to:
+
+Fixed random seed (SEED=42) set globally for:
+
+Python's random module
+NumPy's random number generator
+All scikit-learn algorithms
+XGBoost
+
+
+Documented methodology in both code and report
+Version-controlled dependencies (see requirements above)
+
+To reproduce results:
+
+Use the same dataset (Kaggle Allstate Claims Severity)
+Execute the notebook sequentially
+Ensure SEED=42 is set before any stochastic operation
+
+Note: Exact numerical results may vary slightly across different hardware/OS due to floating-point arithmetic, but differences should be negligible (<0.1%).
+
