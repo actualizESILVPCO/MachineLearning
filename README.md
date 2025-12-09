@@ -115,3 +115,151 @@ Visualization and Reporting
 Performance comparison plots
 Feature importance plots
 Learning curves
+
+# Installation 
+pip install numpy pandas matplotlib seaborn scikit-learn xgboost
+# Code Execution
+
+Upload the notebook
+Execute all cells sequentially
+
+Important: Ensure the dataset files (train.csv) are available in the expected directory.
+Expected Execution Time
+
+Full notebook execution: approximately 15-20 minutes (depending on hardware)
+Hyperparameter tuning: 8-10 minutes
+Model training: 5-7 minutes
+Data preprocessing: 2-3 minutes
+
+# Methodology 
+1. Data Preprocessing
+Outlier Removal:
+
+Method: 3 × IQR (Interquartile Range)
+Threshold: Q3 + 3 × IQR
+Outliers removed: 3,431 observations (1.8%)
+Justification: Extreme values can distort model training
+
+Feature Encoding:
+
+Categorical features: Label Encoding
+Rationale: High cardinality makes one-hot encoding impractical
+
+Feature Scaling:
+
+Method: StandardScaler (mean=0, std=1)
+Applied to: All numerical features
+Rationale: Ensures equal contribution to distance-based algorithms
+
+Train-Test Split:
+
+Ratio: 80% training, 20% testing
+Method: train_test_split with stratification
+Random state: 42 (for reproducibility)
+
+Target Transformation:
+
+Method: Logarithmic transformation log(1 + y)
+Rationale: Addresses right-skewness (skewness=3.79)
+Result: More symmetric distribution, improved model performance
+
+2. Models Implemented
+Baseline Models:
+
+Linear Regression (no regularization)
+Ridge Regression (L2 regularization, alpha=1.0)
+Random Forest (default parameters)
+
+Advanced Models:
+4. Ridge Regression with log-transformed target
+5. Random Forest with log-transformed target
+6. XGBoost with log-transformed target
+7. XGBoost (Tuned) with log-transformed target
+3. Hyperparameter Tuning
+Method: RandomizedSearchCV with 5-fold cross-validation
+Random Forest parameter grid:
+
+n_estimators: [100, 200]
+max_depth: [4, 8]
+min_samples_split: [2, 5]
+max_features: ['auto', 'sqrt']
+
+XGBoost parameter grid:
+
+n_estimators: [100, 200]
+max_depth: [3, 5]
+learning_rate: [0.05, 0.1]
+
+Search strategy:
+
+Number of iterations: 10
+Scoring metric: Mean Absolute Error (MAE)
+Cross-validation folds: 5
+
+4. Evaluation Metrics
+Primary metric: Mean Absolute Error (MAE)
+
+Measures average absolute deviation from true values
+Easy to interpret (in original units)
+Robust to outliers
+
+Secondary metrics:
+
+Root Mean Squared Error (RMSE): Penalizes large errors more heavily
+R² Score: Proportion of variance explained by the model
+
+Implementation Details
+Key Code Sections
+
+1. Random Seed Configuration :
+pythonSEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+os.environ['PYTHONHASHSEED'] = str(SEED)
+
+Ensures reproducibility across all stochastic operations.
+
+2. Outlier Removal :
+pythonQ1 = df['loss'].quantile(0.25)
+Q3 = df['loss'].quantile(0.75)
+IQR = Q3 - Q1
+outlier_threshold = Q3 + 3*IQR
+df = df[df['loss'] <= outlier_threshold]
+Removes extreme values using the 3×IQR method.
+
+3. Feature Encoding :
+pythonlabel_encoders = {}
+for col in categorical_features:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
+Applies label encoding to all categorical features.
+
+4. Log Transformation :
+pythony_train_log = np.log1p(y_train)
+y_test_log = np.log1p(y_test)
+Applies log(1+x) transformation to target variable.
+
+5. Hyperparameter Tuning :
+pythonparam_dist = {
+    'n_estimators': [100, 200],
+    'max_depth': [3, 5],
+    'learning_rate': [0.05, 0.1]
+}
+
+random_search = RandomizedSearchCV(
+    xgb_model,
+    param_distributions=param_dist,
+    n_iter=10,
+    cv=5,
+    scoring='neg_mean_absolute_error',
+    random_state=SEED
+)
+Searches for optimal hyperparameters using cross-validation.
+
+6. Model Evaluation :
+pythony_pred = model.predict(X_test)
+mae = mean_absolute_error(y_test, y_pred)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+r2 = r2_score(y_test, y_pred)
+Calculates performance metrics for model comparison.
