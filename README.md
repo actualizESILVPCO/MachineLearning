@@ -350,3 +350,20 @@ Test additional models (LightGBM, CatBoost)
 Implement SHAP values for better interpretability
 Optimize for prediction speed (model compression)
 
+# References
+Academic:
+
+Chen, T., & Guestrin, C. (2016). XGBoost: A Scalable Tree Boosting System. Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, 785–794. https://doi.org/10.1145/2939672.2939785
+Breiman, L. (2001). Random Forests. Machine Learning, 45(1), 5–32. https://doi.org/10.1023/A:1010933404324
+Hastie, T., Tibshirani, R., & Friedman, J. (2009). The Elements of Statistical Learning: Data Mining, Inference, and Prediction (2nd ed.). Springer.
+
+Dataset:
+Allstate Corporation. (2016). Allstate Claims Severity. Kaggle. https://www.kaggle.com/c/allstate-claims-severity
+Libraries:
+
+scikit-learn: https://scikit-learn.org/
+XGBoost: https://xgboost.readthedocs.io/
+pandas: https://pandas.pydata.org/
+NumPy: https://numpy.org/
+
+
