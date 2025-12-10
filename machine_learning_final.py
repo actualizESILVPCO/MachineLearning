@@ -376,15 +376,6 @@ print(f"Skewness reduce: {y_train.skew():.2f} -> {y_train_log.skew():.2f}")
 # 5. PROBLEM FORMALIZATION
 
 """
-
-# Separate X and y
-X = df_processed.drop(target, axis=1)
-y = df_processed[target]
-
-print(f'Features (X): {X.shape}')
-print(f'Target (y): {y.shape}')
-print(f'\nFeature names: {X.columns.tolist()[:10]}...')
-
 """## Problem Type
 
 **Supervised Regression**
